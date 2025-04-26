@@ -107,6 +107,23 @@ public class Responder
     }
 
     /**
+     * Process a single entry from the responses file.
+     * If it contains a comma, treat it as a key-value pair for the response map.
+     * If not, treat it as a default response.
+     */
+    private void processEntry(String entry)
+    {
+        if (entry.contains(",")) {
+            String[] parts = entry.split(",", 2);
+            String key = parts[0].trim().toLowerCase();
+            String value = parts[1].trim();
+            responseMap.put(key, value);
+        } else {
+            defaultResponses.add(entry.trim());
+        }
+    }
+
+    /**
      * Build up a list of default responses from which we can pick
      * if we don't know what else to say.
      */
