@@ -67,6 +67,43 @@ public class Responder
      */
     private void fillResponseMap()
     {
+        Charset charset = Charset.forName("US-ASCII");
+        Path path = Paths.get("responses.txt");
+
+        try (BufferedReader reader = Files.newBufferedReader(path, charset)) {
+            String line;
+            StringBuilder entryBuilder = new StringBuilder();
+            int blankLineCount = 0;
+
+            while ((line = reader.readLine()) != null) {
+                if (line.trim().isEmpty()) {
+                    blankLineCount++;
+
+                    if (blankLineCount == 3) {
+                        throw new IOException("Three blank lines detected in responses.txt");
+                    }
+
+                    if (entryBuilder.length() > 0) {
+                        processEntry(entryBuilder.toString());
+                        entryBuilder.setLength(0); // Clear for next entry
+                    }
+                } else {
+                    blankLineCount = 0;
+                    if (entryBuilder.length() > 0) {
+                        entryBuilder.append(" ");
+                    }
+                    entryBuilder.append(line.trim());
+                }
+            }
+
+            // Handle last entry if file doesn't end with a blank line
+            if (entryBuilder.length() > 0) {
+                processEntry(entryBuilder.toString());
+            }
+        }
+        catch (IOException e) {
+            System.err.println("Error reading responses.txt: " + e.getMessage());
+        }
     }
 
     /**
